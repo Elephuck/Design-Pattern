@@ -1,0 +1,109 @@
+//Design Pattern 
+
+//Simple Factory Model
+
+interface People
+{
+    public function say();
+
+}
+
+class Man implements People
+{
+    public function say()
+    {
+        println 'this is a man ';
+    }
+}
+
+class Women implements People
+{
+    public function say()
+    {
+        println 'this is a women';
+    }
+}
+
+class SimpleFactory
+{
+    public static function create(name)
+    {
+    if (name == 'man') {
+            return new Man();
+        } elseif (name == 'women') {
+            return new Women();
+        }
+    }
+
+}
+
+//call
+man = SimpleFactory::create('man');
+man.say();
+women = SimpleFactory::create('women');
+women.say();
+
+
+//Facroty Model
+
+interface People
+{
+    public function say();
+}
+
+class Man implements People
+{
+    public function say()
+    {
+        echo 'this is a man';
+    }
+}
+
+class Women implements People
+{
+    public function say()
+    {
+        echo 'this is a women';
+    }
+}
+
+//Compared with the simple factory model. The difference is that here the object creation is abstracted into an interface
+interface CreatePeople
+{
+    public function create();
+}
+
+class FactoryMan implements CreatePeople
+{
+    public function create()
+    {
+        return new Man();
+    }
+
+}
+
+class FactoryWomen implements CreatePeople
+{
+    public function create()
+    {
+        return new Women();
+    }
+}
+
+class  Client
+{
+    // Test
+    public function test() {
+        factory = new FactoryMan();
+        man = factory.create();
+        man.say();
+
+        factory = new FactoryWomen();
+        man = factory.create();
+        man.say();
+    }
+}
+
+// Excute
+demo = new Client();
+demo.test();
