@@ -1,0 +1,128 @@
+public class Light {
+
+    public void on() {
+        System.out.println("Light on...");
+    }
+
+    public void off() {
+        System.out.println("Light off...");
+    }
+}
+
+public interface Command {
+
+    void execute();
+
+    void undo();
+}
+
+public class LightOnCommand implements Command {
+
+    private Light light;
+
+    public LightOnCommand(Light light) {
+        this.light = light;
+    }
+
+    public void execute() {
+        light.on();
+    }
+
+    public void undo() {
+        light.off();
+    }
+}
+
+
+public class LightOffCommand implements Command {
+
+    private Light light;
+
+    public LightOffCommand(Light light) {
+        this.light = light;
+    }
+
+    public void execute() {
+        light.off();
+    }
+
+    public void undo() {
+        light.on();
+    }
+}
+
+
+public class RemoteInvoker {
+
+    /**
+     * 开关命令数组，模拟有很多对开关数组
+     */
+    private Command[] onCommands;
+    private Command[] offCommands;
+    /**
+     * 撤销（回退）命令
+     */
+    private Command undoCommand;
+
+    public RemoteInvoker(int length) {
+        // 有几组开关，就设置多少数组
+        onCommands = new Command[length];
+        offCommands = new Command[length];
+        // 把每个命令初始化成空命令，避免空指针异常
+        Command noCommand = new NoCommand();
+        undoCommand = noCommand;
+        for (int i = 0; i < length; i++) {
+            onCommands[i] = noCommand;
+            offCommands[i] = noCommand;
+        }
+    }
+
+    /**
+     * @Description 设置命令对象
+     * @date 2018/11/29 09:15
+     * @param slot 遥控器的位置
+     * @param onCommand 开的命令
+     * @param offCommand 关的命令
+     * @return void
+     */
+    public void setCommond(int slot, Command onCommand, Command offCommand) {
+        onCommands[slot] = onCommand;
+        offCommands[slot] = offCommand;
+    }
+
+
+    public void onButton(int slot) {
+        onCommands[slot].execute();
+        //为撤销（回退）按钮记录动作
+        undoCommand = onCommands[slot];
+    }
+
+    public void offButton(int slot) {
+        offCommands[slot].execute();
+        //为撤销（回退）按钮记录动作
+        undoCommand = offCommands[slot];
+    }
+
+    public void undoButton() {
+        undoCommand.undo();
+    }
+}
+
+
+public class RemoteClient {
+
+    public static void main(String[] args) {
+        // 1、创建接收者
+        Light light = new Light();
+        // 2、创建命令对象
+        LightOnCommand lightOnCommand = new LightOnCommand(light);
+        LightOffCommand lightOffCommand = new LightOffCommand(light);
+        // 3、创建一组开关并用命令对象装载它
+        RemoteInvoker invoker = new RemoteInvoker(1);
+        invoker.setCommond(0, lightOnCommand, lightOffCommand);
+        // 4.Test
+        invoker.onButton(0);
+        invoker.offButton(0);
+        invoker.undoButton();
+    }
+}
